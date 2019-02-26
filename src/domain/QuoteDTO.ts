@@ -1,8 +1,25 @@
 export class QuoteDTO {
-    public _message: string;
+    private _id: string;
+    private _message: string;
 
-
-    public constructor() {
+    constructor() {
+        this._id = null;
         this._message = null;
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    set id(value: string) {
+        this._id = value;
+    }
+
+    get message(): string {
+        return this._message;
+    }
+
+    set message(value: string) {
+        this._message = value;
     }
 }

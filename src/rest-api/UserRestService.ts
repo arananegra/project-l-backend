@@ -1,3 +1,6 @@
+import {DbConnectionBS} from "../bs/DbConnectionBS";
+import {QuoteDTO} from "../domain/QuoteDTO";
+
 export class UserRestService {
     private app: any;
 
@@ -13,10 +16,20 @@ export class UserRestService {
     public test() {
         this.app.get("/test", async (request, response) => {
                 try {
-                    response.status(200).send({hello: "Hello world"})
+
+                    let quoteDTO = new QuoteDTO();
+
+                    let connection = await DbConnectionBS.getConnection();
+
+                    //quoteDTO._id = new ObjectID();
+                    quoteDTO.message = "hola";
+                    connection.collection("testCollection").insertOne(quoteDTO);
+                    let results = await connection.collection("testCollection").find({}).toArray();
+                    response.status(200).send(JSON.stringify(results));
+
                 } catch (Exception) {
-                    console.trace(Exception);
-                    response.status(500).send();
+                    console.log("Es un exceptionnnn del servicioo!!! !", Exception);
+                    response.status(500).send(Exception);
                 }
             }
         );
