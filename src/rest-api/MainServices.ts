@@ -1,9 +1,9 @@
 import * as express from "express";
-import {UserRestService} from "./UserRestService";
+import {QuotesRestService} from "./QuotesRestService";
 
 export class MainServices {
 
     public constructor(applicationRouter: express.Router) {
-        new UserRestService(applicationRouter);
+        new QuotesRestService(applicationRouter);
     }
 }

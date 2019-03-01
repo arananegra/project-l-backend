@@ -1,5 +1,7 @@
+import {ObjectID} from "mongodb";
+
 export class QuoteDTO {
-    private _id: string;
+    private _id: ObjectID;
     private _message: string;
 
     constructor() {
