@@ -1,5 +1,5 @@
 import {MongoDBConnectionDAO} from "../dao/MongoDBConnectionDAO";
-import {Client, Db} from "mongodb";
+import {Client, Db, Session} from "mongodb";
 import {DatabaseConstants} from "../constants/DatabaseConstants";
 
 export class DbConnectionBS {
@@ -7,8 +7,8 @@ export class DbConnectionBS {
         try {
             let daoInstance = await MongoDBConnectionDAO.getClientInstance();
             return daoInstance.getClient();
-        } catch (exception) {
-            throw exception;
+        } catch (Exception) {
+            throw Exception;
         }
     }
 
@@ -23,8 +23,8 @@ export class DbConnectionBS {
             }
             return db;
 
-        } catch (exception) {
-            throw exception;
+        } catch (Exception) {
+            throw Exception;
         }
     }
 
@@ -33,4 +33,23 @@ export class DbConnectionBS {
             clientReference.close();
         }
     }
+
+    public static async commitWithRetry(session: Session) {
+        try {
+            await session.commitTransaction();
+        } catch (Exception) {
+            if (
+                Exception.errorLabels &&
+                Exception.errorLabels.indexOf('UnknownTransactionCommitResult') >= 0
+            ) {
+                console.log('UnknownTransactionCommitResult, retrying commit operation ...');
+                await this.commitWithRetry(session);
+            } else {
+                console.log('Error during commit ...');
+                console.trace(Exception);
+                throw Exception;
+            }
+        }
+    }
+
 }

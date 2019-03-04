@@ -1,6 +1,6 @@
 let path = require('path');
 let basePath = __dirname;
-//let nodeExternals = require('webpack-node-externals');
+let nodeExternals = require('webpack-node-externals');
 const NodemonPlugin = require( 'nodemon-webpack-plugin' );
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js', '.jsx']
     },
     target: "node",
-    //externals: [nodeExternals()],
+    externals: [nodeExternals(), "node_helper"],
 
     node: {
         fs: "empty",
@@ -55,7 +55,7 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-                use: 'base64-inline-loader?limit=1000&name=[name].[ext]'
+                use: 'base64-inline-loader?limit=1000&username=[username].[ext]'
             }
         ],
     },
