@@ -5,6 +5,7 @@ import * as express from "express";
 import * as helmet from "helmet";
 import "reflect-metadata";
 import * as jwt from "express-jwt"
+import * as jsonwebtoken from "jsonwebtoken";
 import {MainServices} from "./src/rest-api/MainServices";
 import {ServiceConstants} from "./src/constants/ServiceConstants";
 
@@ -52,6 +53,22 @@ app.use(function (err, req, res, next) {
     }
 });
 
+// Refresh token on any successful request (not 401 or 500)
+app.use(function refreshToken(request: express.Request, response: express.Response, next) {
+    if (response.statusCode != 401
+        && response.statusCode != 500) {
+        if (request.headers[ServiceConstants.BEARER_NAME_CONSTANT]) {
+            let tokenDecoded: any = jsonwebtoken.decode(request.headers[ServiceConstants.BEARER_NAME_CONSTANT].toString(), {json: true});
+            let token = jsonwebtoken.sign({"email": tokenDecoded.email}, ServiceConstants.TOKEN_SECRET, {
+                    expiresIn: '1h' //1h, 2d ...
+                }
+            );
+            response.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
+        }
+
+        next();
+    }
+});
 
 //Url context before services username
 app.use('/api', router);

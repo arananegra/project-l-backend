@@ -22,12 +22,12 @@ export class UserRestService {
                 try {
                     let userBS = new UserBS();
                     let userToLogin: UserDTO = new UserDTO();
-                    userToLogin = {...request.body};
+                    userToLogin = {...userToLogin, ...request.body};
 
                     let resultOfLoginUser: UserDTO = await userBS.loginUser(userToLogin);
                     if (resultOfLoginUser !== null) {
-                        let token = jsonwebtoken.sign({"data": userToLogin.password}, ServiceConstants.TOKEN_SECRET, {
-                                expiresIn: '30s'
+                        let token = jsonwebtoken.sign({"email": userToLogin.email}, ServiceConstants.TOKEN_SECRET, {
+                                expiresIn: '1h'
                             }
                         );
                         response.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
@@ -48,16 +48,16 @@ export class UserRestService {
                 try {
                     let userBS = new UserBS();
                     let userToRegister: UserDTO = new UserDTO();
-                    userToRegister = {...request.body};
+                    userToRegister = {...userToRegister, ...request.body};
 
                     let resultOfRegisterUser = await userBS.registerNewUser(userToRegister);
                     if (resultOfRegisterUser !== null) {
-                        let token = jsonwebtoken.sign({"data": userToRegister.password}, ServiceConstants.TOKEN_SECRET, {
-                                expiresIn: '30s' //1h, 2d ...
+                        let token = jsonwebtoken.sign({"email": userToRegister.email}, ServiceConstants.TOKEN_SECRET, {
+                                expiresIn: '1h' //1h, 2d ...
                             }
                         );
                         response.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
-                        response.status(201).send();
+                        response.status(201).send(resultOfRegisterUser);
                     } else {
                         response.status(409).send("User already exists");
                     }

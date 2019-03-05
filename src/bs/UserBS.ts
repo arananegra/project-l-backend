@@ -3,7 +3,6 @@ import {UserDAO} from "../dao/UserDAO";
 import {UserDTO} from "../domain/UserDTO";
 import {DatabaseConstants} from "../constants/DatabaseConstants";
 import {DbConnectionBS} from "./DbConnectionBS";
-import {CollectionIndexCreator} from "../dao/CollectionIndexCreator";
 
 export class UserBS {
     private userDAO: UserDAO;
