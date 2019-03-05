@@ -29,16 +29,4 @@ export class QuoteDAO {
             throw Exception;
         }
     }
-
-    public async getRandomQuote(collectionReference: Collection): Promise<QuoteDTO> {
-        try {
-            let quoteRandomDocumentCursos = await collectionReference.aggregate([{$sample: {size: 1}}]);
-            let quoteDTO = new QuoteDTO();
-            quoteDTO = await quoteRandomDocumentCursos.toArray();
-            return quoteDTO[0];
-        } catch (Exception) {
-            console.trace(Exception);
-            throw Exception;
-        }
-    }
 }

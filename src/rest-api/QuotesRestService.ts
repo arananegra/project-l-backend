@@ -5,7 +5,6 @@ import {UserDTO} from "../domain/UserDTO";
 import {ExceptionConstants} from "../constants/ExceptionConstants";
 import {ExceptionDTO} from "../domain/ExceptionDTO";
 import {ServiceConstants} from "../constants/ServiceConstants";
-import {UserBS} from "../bs/UserBS";
 
 export class QuotesRestService {
     private app: any;
@@ -16,28 +15,7 @@ export class QuotesRestService {
     }
 
     public initializeUserRestServiceRoutes() {
-        this.test();
         this.getNewQuoteForUser();
-    }
-
-    public test() {
-        this.app.get("/test", async (request, response) => {
-                try {
-                    let userBS = new UserBS();
-
-                    let userToUpdate = new UserDTO();
-                    userToUpdate._id = request.query.userId;
-                    userToUpdate.email = "pakito@gmail.com";
-                    let updatedUser = await userBS.updateUser(userToUpdate);
-
-                    response.status(200).send(updatedUser);
-
-                } catch (Exception) {
-                    console.log(Exception);
-                    response.status(500).send(Exception);
-                }
-            }
-        );
     }
 
     public getNewQuoteForUser() {

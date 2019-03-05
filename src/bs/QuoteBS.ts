@@ -18,22 +18,6 @@ export class QuoteBS {
         this.userBS = new UserBS();
     }
 
-    public async getRandomQuote(): Promise<QuoteDTO> {
-        const client: Client = await DbConnectionBS.getClient()
-            .catch((clientException) => {
-                throw clientException;
-            });
-
-        try {
-            const db: Db = await DbConnectionBS.getDbFromClient(client);
-            const quotesCollection = db.collection(DatabaseConstants.QUOTE_COLLECTION_NAME);
-            return await this.quoteDAO.getRandomQuote(quotesCollection);
-        } catch (Exception) {
-            console.trace(Exception);
-            throw Exception;
-        }
-    }
-
     public async getQuoteNotInUseByUser(userToCheckUsedQuotes: UserDTO): Promise<QuoteDTO> {
         const client: Client = await DbConnectionBS.getClient()
             .catch((clientException) => {
@@ -49,12 +33,15 @@ export class QuoteBS {
             let userToCheckWithFilledFieldsArray = await this.userBS.getUsersBySearcher(userSearcher);
             let singleUserCheckWithFilledField = userToCheckWithFilledFieldsArray[0];
             let currentTimestamp = new Date().getTime();
+
             if (singleUserCheckWithFilledField !== null && singleUserCheckWithFilledField !== undefined) {
                 if (singleUserCheckWithFilledField.lastQuoteRequiredDate === null ||
                     currentTimestamp - singleUserCheckWithFilledField.lastQuoteRequiredDate > DatabaseConstants.TWENTY_FOUR_HOURS_IN_MILISECONDS) {
+
                     if (singleUserCheckWithFilledField.alreadyUsedQuotes === null) {
                         singleUserCheckWithFilledField.alreadyUsedQuotes = [];
                     }
+
                     quoteNotInUse = await this.quoteDAO.getQuoteNotInUseByUser(quotesCollection, singleUserCheckWithFilledField);
 
                     if (quoteNotInUse !== null) {
