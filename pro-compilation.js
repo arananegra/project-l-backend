@@ -9,7 +9,7 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js', '.jsx']
     },
     target: "node",
-    //externals: [nodeExternals()],
+    //externals: ["bcrypt"],
 
     node: {
         fs: "empty",

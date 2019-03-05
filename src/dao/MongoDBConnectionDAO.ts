@@ -20,11 +20,9 @@ export class MongoDBConnectionDAO {
                 this._instance._mongoClient = await MongoClient.connect(DatabaseConstants.PROJECT_L_DATABASE_URL, {
                     useNewUrlParser: true
                 });
-                console.log("POOL FIRST INSTANCE");
                 return MongoDBConnectionDAO._instance;
 
             } else {
-                console.log("POOL FROM MEMORY");
                 return MongoDBConnectionDAO._instance;
             }
 

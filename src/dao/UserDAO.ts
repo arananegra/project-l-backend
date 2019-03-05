@@ -1,4 +1,4 @@
-import {compare, hash} from "bcrypt"
+import {compare, hash} from "bcryptjs"
 import {Collection, Db, Session} from "mongodb";
 import {UserDTO} from "../domain/UserDTO";
 import {DatabaseConstants} from "../constants/DatabaseConstants";

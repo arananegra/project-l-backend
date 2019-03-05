@@ -47,7 +47,7 @@ app.use(jwtCheck);
 // Function fallback for Auth errors
 
 app.use(function (err, req, res, next) {
-    if (err.constructor.name === 'UnauthorizedError') {
+    if (err.name === 'UnauthorizedError') {
         res.status(401).send(err);
     }
 });

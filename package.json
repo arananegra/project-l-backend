@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start:dev": "./node_modules/npm/bin/npm-cli.js run-script compile:pre && ./node_modules/npm/bin/npm-cli.js run-script watch:dev",
+    "start": "./node_modules/npm/bin/npm-cli.js run-script compile:pre && ./node_modules/npm/bin/npm-cli.js run-script watch:dev",
     "compile:pre": "./node_modules/webpack-cli/bin/cli.js --config pre-compilation.js --mode development",
     "watch:dev": "./node_modules/webpack-cli/bin/cli.js --config pre-compilation --watch --mode development",
-    "compile": "./node_modules/webpack-cli/bin/cli.js --config pro-compilation.js --mode development",
+    "compile": "./node_modules/webpack-cli/bin/cli.js --config pro-compilation.js --mode production",
     "test": "./node_modules/mocha/bin/mocha --full-trace -r ts-node/register ./test/src/**/*.spec.ts",
     "test:watch": "./node_modules/mocha/bin/mocha --full-trace --watch-extensions ts --watch -r ts-node/register ./test/src/**/*.spec.ts"
   },
@@ -27,7 +27,7 @@
     "locate-path": "3.0.0",
     "lodash": "4.17.11",
     "reflect-metadata": "0.1.13",
-    "bcrypt": "3.0.4"
+    "bcryptjs": "2.4.3"
   },
   "devDependencies": {
     "@types/bcrypt": "3.0.0",
