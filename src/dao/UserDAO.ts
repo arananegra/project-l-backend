@@ -109,4 +109,44 @@ export class UserDAO {
             throw Exception;
         }
     }
+
+    public async updateUser(collectionReference: Collection, userToUpdate: UserDTO): Promise<UserDTO> {
+        try {
+            let updateObject = {};
+
+            if (userToUpdate.username !== null) {
+                updateObject[DatabaseConstants.USERNAME_FIELD_NAME] = userToUpdate.username;
+            }
+
+            if (userToUpdate.email !== null) {
+                updateObject[DatabaseConstants.EMAIL_FIELD_NAME] = userToUpdate.email;
+            }
+
+            if (userToUpdate.password !== null) {
+                updateObject[DatabaseConstants.PASSWORD_FIELD_NAME] = await hash(userToUpdate.password, 10);
+            }
+
+            if (userToUpdate.alreadyUsedQuotes !== null) {
+                updateObject[DatabaseConstants.ALREADY_USED_QUOTES_FIELD_NAME] = userToUpdate.alreadyUsedQuotes
+            }
+
+            if (userToUpdate.lastQuoteRequiredDate !== null) {
+                updateObject[DatabaseConstants.LAST_QUOTED_REQUIRED_DATE_FIELD_NAME] = userToUpdate.lastQuoteRequiredDate
+            }
+            let result = await collectionReference.updateOne(
+                {[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userToUpdate._id)},
+                {
+                    $set: updateObject
+                }
+            );
+
+            console.log(result)
+
+            return userToUpdate;
+
+        } catch (Exception) {
+            console.trace(Exception);
+            throw Exception;
+        }
+    }
 }

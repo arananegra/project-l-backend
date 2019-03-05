@@ -6,7 +6,7 @@ import {DatabaseConstants} from "../constants/DatabaseConstants";
 
 export class QuoteDAO {
 
-    public async getQuoteNonInUseByUser(collectionReference: Collection, userToCheckUsedQuotes: UserDTO): Promise<QuoteDTO> {
+    public async getQuoteNotInUseByUser(collectionReference: Collection, userToCheckUsedQuotes: UserDTO): Promise<QuoteDTO> {
         try {
             let nonUsedQuoteByUser = null;
             let quotesIdsAlreadyUsed = [];

@@ -34,30 +34,31 @@ export class QuoteBS {
         }
     }
 
-    public async getQuoteNonInUseByUser(userToCheckUsedQuotes: UserDTO): Promise<QuoteDTO> {
+    public async getQuoteNotInUseByUser(userToCheckUsedQuotes: UserDTO): Promise<QuoteDTO> {
         const client: Client = await DbConnectionBS.getClient()
             .catch((clientException) => {
                 throw clientException;
             });
 
         try {
-            let quoteNonInUse = null;
+            let quoteNotInUse = null;
             const db: Db = await DbConnectionBS.getDbFromClient(client);
             const quotesCollection = db.collection(DatabaseConstants.QUOTE_COLLECTION_NAME);
             let userSearcher = new UserSearcher();
             userSearcher.idCriteria = userToCheckUsedQuotes._id;
             let userToCheckWithFilledFieldsArray = await this.userBS.getUsersBySearcher(userSearcher);
             let singleUserCheckWithFilledField = userToCheckWithFilledFieldsArray[0];
+
             if (singleUserCheckWithFilledField !== null && singleUserCheckWithFilledField !== undefined) {
                 if (singleUserCheckWithFilledField.alreadyUsedQuotes === null) {
                     singleUserCheckWithFilledField.alreadyUsedQuotes = [];
                 }
-                quoteNonInUse = await this.quoteDAO.getQuoteNonInUseByUser(quotesCollection, singleUserCheckWithFilledField);
+                quoteNotInUse = await this.quoteDAO.getQuoteNotInUseByUser(quotesCollection, singleUserCheckWithFilledField);
             } else {
                 throw new ExceptionDTO(ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID, ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_MESSAGE);
             }
 
-            return quoteNonInUse;
+            return quoteNotInUse;
         } catch (Exception) {
             console.trace(Exception);
             throw Exception;

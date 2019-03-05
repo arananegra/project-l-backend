@@ -72,4 +72,20 @@ export class UserBS {
             throw Exception;
         }
     }
+
+    public async updateUser(userToUpdate: UserDTO): Promise<UserDTO> {
+        const client: Client = await DbConnectionBS.getClient()
+            .catch((clientException) => {
+                throw clientException;
+            });
+
+        try {
+            const db: Db = await DbConnectionBS.getDbFromClient(client);
+            const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
+            return await this.userDAO.updateUser(usersCollection, userToUpdate);
+        } catch (Exception) {
+            console.trace(Exception);
+            throw Exception;
+        }
+    }
 }

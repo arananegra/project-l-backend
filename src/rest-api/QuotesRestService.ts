@@ -4,6 +4,10 @@ import {QuoteDTO} from "../domain/QuoteDTO";
 import {UserDTO} from "../domain/UserDTO";
 import {ExceptionConstants} from "../constants/ExceptionConstants";
 import {ExceptionDTO} from "../domain/ExceptionDTO";
+import {ServiceConstants} from "../constants/ServiceConstants";
+import {UserSearcher} from "../domain/searchers/UserSearcher";
+import {UserBS} from "../bs/UserBS";
+import {UserDAO} from "../dao/UserDAO";
 
 export class QuotesRestService {
     private app: any;
@@ -15,17 +19,20 @@ export class QuotesRestService {
 
     public initializeUserRestServiceRoutes() {
         this.test();
-        this.test1();
+        this.getNewQuoteForUser();
     }
 
     public test() {
-        this.app.get("/random-quote", async (request, response) => {
+        this.app.get("/test", async (request, response) => {
                 try {
-                    let quoteBS = new QuoteBS();
-                    let randomQuote = new QuoteDTO();
-                    randomQuote = await quoteBS.getRandomQuote();
+                    let userBS = new UserBS();
 
-                    response.status(200).send(randomQuote);
+                    let userToUpdate = new UserDTO();
+                    userToUpdate._id = request.query.userId;
+                    userToUpdate.email = "pakito@gmail.com";
+                    let updatedUser = await userBS.updateUser(userToUpdate);
+
+                    response.status(200).send(updatedUser);
 
                 } catch (Exception) {
                     console.log(Exception);
@@ -35,8 +42,8 @@ export class QuotesRestService {
         );
     }
 
-    public test1() {
-        this.app.get("/test", async (request, response) => {
+    public getNewQuoteForUser() {
+        this.app.get(ServiceConstants.GET_NEW_QUOTE, async (request, response) => {
                 try {
                     let quoteBS = new QuoteBS();
                     let notUsedQuote = new QuoteDTO();
@@ -47,7 +54,7 @@ export class QuotesRestService {
                     } else {
                         response.status(412).send(new ExceptionDTO(ExceptionConstants.MISSING_ID_FIELD_ID, ExceptionConstants.MISSING_ID_FIELD_MESSAGE));
                     }
-                    notUsedQuote = await quoteBS.getQuoteNonInUseByUser(userRequesting);
+                    notUsedQuote = await quoteBS.getQuoteNotInUseByUser(userRequesting);
 
                     if (notUsedQuote !== null) {
                         response.status(200).send(notUsedQuote);

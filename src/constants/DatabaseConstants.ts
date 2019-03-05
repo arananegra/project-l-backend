@@ -9,5 +9,8 @@ export class DatabaseConstants {
 
     public static USERNAME_FIELD_NAME = "username";
     public static EMAIL_FIELD_NAME = "email";
+    public static PASSWORD_FIELD_NAME = "password";
+    public static LAST_QUOTED_REQUIRED_DATE_FIELD_NAME = "lastQuoteRequiredDate";
+    public static ALREADY_USED_QUOTES_FIELD_NAME = "alreadyUsedQuotes";
 
 }
