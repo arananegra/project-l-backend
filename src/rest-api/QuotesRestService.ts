@@ -2,7 +2,8 @@ import {ObjectID} from "mongodb";
 import {QuoteBS} from "../bs/QuoteBS";
 import {QuoteDTO} from "../domain/QuoteDTO";
 import {UserDTO} from "../domain/UserDTO";
-import {ErrorMessagesConstants} from "../constants/ErrorMessagesConstants";
+import {ExceptionConstants} from "../constants/ExceptionConstants";
+import {ExceptionDTO} from "../domain/ExceptionDTO";
 
 export class QuotesRestService {
     private app: any;
@@ -44,7 +45,7 @@ export class QuotesRestService {
                     if (request.query.userId) {
                         userRequesting._id = request.query.userId;
                     } else {
-                        response.status(412).send(new Error(ErrorMessagesConstants.MISSING_ID_FIELD));
+                        response.status(412).send(new ExceptionDTO(ExceptionConstants.MISSING_ID_FIELD_ID, ExceptionConstants.MISSING_ID_FIELD_MESSAGE));
                     }
                     notUsedQuote = await quoteBS.getQuoteNonInUseByUser(userRequesting);
 
@@ -55,9 +56,10 @@ export class QuotesRestService {
                     }
 
                 } catch (Exception) {
-                    console.log(Exception);
-                    if (Exception.message === ErrorMessagesConstants.NO_USER_TO_SEARCH_QUOTES) {
-                        response.status(412).send(ErrorMessagesConstants.NO_USER_TO_SEARCH_QUOTES);
+                    if (Exception instanceof ExceptionDTO) {
+                        if (Exception.code === ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID) {
+                            response.status(412).send(Exception);
+                        }
                     } else {
                         response.status(500).send(Exception);
                     }

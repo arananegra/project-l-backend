@@ -4,6 +4,8 @@ import {UserBS} from "../bs/UserBS";
 import {UserDTO} from "../domain/UserDTO";
 import * as jsonwebtoken from "jsonwebtoken"
 import {UserSearcher} from "../domain/searchers/UserSearcher";
+import {ExceptionDTO} from "../domain/ExceptionDTO";
+import {ExceptionConstants} from "../constants/ExceptionConstants";
 
 export class UserRestService {
     private app: any;
@@ -61,7 +63,7 @@ export class UserRestService {
                         response.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
                         response.status(201).send(resultOfRegisterUser);
                     } else {
-                        response.status(409).send("User already exists");
+                        response.status(409).send(new ExceptionDTO(ExceptionConstants.USER_ALREADY_EXISTS_ID, ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE));
                     }
 
                 } catch (Exception) {

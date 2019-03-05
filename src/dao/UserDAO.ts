@@ -30,6 +30,7 @@ export class UserDAO {
             return userDTOfoundToReturn;
 
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }
@@ -48,6 +49,7 @@ export class UserDAO {
                 return null;
             }
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }
@@ -69,6 +71,7 @@ export class UserDAO {
                 return null;
             }
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }
@@ -94,7 +97,6 @@ export class UserDAO {
             });
 
             let arrayOfFoundedUsers = await userFoundCursor.toArray();
-
             if (arrayOfFoundedUsers !== undefined && arrayOfFoundedUsers.length > 0) {
                 arrayOfFoundedUsers.map((userFound: UserDTO) => {
                     userDTOfoundsToReturn.push(userFound);
@@ -103,6 +105,7 @@ export class UserDAO {
             return userDTOfoundsToReturn;
 
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }

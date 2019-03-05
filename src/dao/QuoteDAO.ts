@@ -25,6 +25,7 @@ export class QuoteDAO {
             return nonUsedQuoteByUser;
 
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }
@@ -36,6 +37,7 @@ export class QuoteDAO {
             quoteDTO = await quoteRandomDocumentCursos.toArray();
             return quoteDTO[0];
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }

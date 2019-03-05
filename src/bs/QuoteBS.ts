@@ -6,7 +6,8 @@ import {QuoteDAO} from "../dao/QuoteDAO";
 import {UserDTO} from "../domain/UserDTO";
 import {UserBS} from "./UserBS";
 import {UserSearcher} from "../domain/searchers/UserSearcher";
-import {ErrorMessagesConstants} from "../constants/ErrorMessagesConstants";
+import {ExceptionConstants} from "../constants/ExceptionConstants";
+import {ExceptionDTO} from "../domain/ExceptionDTO";
 
 export class QuoteBS {
     private quoteDAO;
@@ -28,6 +29,7 @@ export class QuoteBS {
             const quotesCollection = db.collection(DatabaseConstants.QUOTE_COLLECTION_NAME);
             return await this.quoteDAO.getRandomQuote(quotesCollection);
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }
@@ -52,11 +54,12 @@ export class QuoteBS {
                 }
                 quoteNonInUse = await this.quoteDAO.getQuoteNonInUseByUser(quotesCollection, singleUserCheckWithFilledField);
             } else {
-                throw new Error(ErrorMessagesConstants.NO_USER_TO_SEARCH_QUOTES);
+                throw new ExceptionDTO(ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID, ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_MESSAGE);
             }
 
             return quoteNonInUse;
         } catch (Exception) {
+            console.trace(Exception);
             throw Exception;
         }
     }
