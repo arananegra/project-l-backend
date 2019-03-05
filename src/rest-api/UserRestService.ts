@@ -3,6 +3,7 @@ import {ServiceConstants} from "../constants/ServiceConstants";
 import {UserBS} from "../bs/UserBS";
 import {UserDTO} from "../domain/UserDTO";
 import * as jsonwebtoken from "jsonwebtoken"
+import {UserSearcher} from "../domain/searchers/UserSearcher";
 
 export class UserRestService {
     private app: any;
@@ -15,6 +16,7 @@ export class UserRestService {
     public initializeUserRestServiceRoutes() {
         this.loginUser();
         this.registerUser();
+        this.searchUser();
     }
 
     private loginUser() {
@@ -60,6 +62,40 @@ export class UserRestService {
                         response.status(201).send(resultOfRegisterUser);
                     } else {
                         response.status(409).send("User already exists");
+                    }
+
+                } catch (Exception) {
+                    console.log(Exception);
+                    response.status(500).send(Exception);
+                }
+            }
+        );
+    }
+
+    private searchUser() {
+        this.app.get(ServiceConstants.SEARCH_USER, async (request, response) => {
+                try {
+                    let userBS = new UserBS();
+                    let userSearcher: UserSearcher = new UserSearcher();
+
+                    if (request.query.id) {
+                        userSearcher.idCriteria = request.query.id;
+                    }
+
+                    if (request.query.username) {
+                        userSearcher.usernameCriteria = request.query.username;
+                    }
+
+                    if (request.query.email) {
+                        userSearcher.emailCriteria = request.query.email;
+                    }
+
+                    let foundedUser = await userBS.getUsersBySearcher(userSearcher);
+
+                    if (foundedUser !== null) {
+                        response.status(200).send(foundedUser);
+                    } else {
+                        response.status(404).send();
                     }
 
                 } catch (Exception) {

@@ -3,6 +3,7 @@ export class ServiceConstants {
 
     public static LOGIN_ROUTE: string = "/login";
     public static REGISTER_ROUTE: string = "/register";
+    public static SEARCH_USER: string = "/search-user";
     public static BASE_API: string = "/api";
     public static BEARER_NAME_CONSTANT: string = "bearer";
 }

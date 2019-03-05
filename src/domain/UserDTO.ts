@@ -6,7 +6,7 @@ export class UserDTO {
     public email: string;
     public password: string;
     public lastQuoteRequiredDate: number;
-    public alreadyUsedQuotes: Array<number>;
+    public alreadyUsedQuotes: Array<ObjectID>;
 
     constructor() {
         this._id = null;

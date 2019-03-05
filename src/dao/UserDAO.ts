@@ -1,5 +1,5 @@
 import {compare, hash} from "bcryptjs"
-import {Collection, Db, Session} from "mongodb";
+import {Collection, Db, Session, ObjectID} from "mongodb";
 import {UserDTO} from "../domain/UserDTO";
 import {DatabaseConstants} from "../constants/DatabaseConstants";
 import {UserSearcher} from "../domain/searchers/UserSearcher";
@@ -33,7 +33,7 @@ export class UserDAO {
             if (arrayOfFoundedUsers !== undefined && arrayOfFoundedUsers.length > 0) {
                 arrayOfFoundedUsers.map((userFound: UserDTO) => {
                     userDTOfoundToReturn = new UserDTO();
-                    userDTOfoundToReturn = {...userFound};
+                    userDTOfoundToReturn = {...userDTOfoundToReturn, ...userFound};
                 });
             }
             return userDTOfoundToReturn;
@@ -61,12 +61,12 @@ export class UserDAO {
         }
     }
 
-    public async loginUser(connectionReference: Db, userToVerify: UserDTO): Promise<UserDTO> {
+    public async loginUser(collectionReference: Collection, userToVerify: UserDTO): Promise<UserDTO> {
         try {
             let userSearcherFromNewInsertRequest = new UserSearcher();
             userSearcherFromNewInsertRequest.usernameCriteria = userToVerify.username;
             userSearcherFromNewInsertRequest.emailCriteria = userToVerify.email;
-            let userFromDb = await this.checkIfUserExists(connectionReference, userSearcherFromNewInsertRequest);
+            let userFromDb = await this.checkIfUserExists(collectionReference, userSearcherFromNewInsertRequest);
             if (userFromDb !== null) {
                 let compareResult = await compare(userToVerify.password, userFromDb.password);
                 if (compareResult) {
@@ -77,6 +77,40 @@ export class UserDAO {
             } else {
                 return null;
             }
+        } catch (Exception) {
+            throw Exception;
+        }
+    }
+
+    public async getUsersBySearcher(collectionReference: Collection, userSearcher: UserSearcher): Promise<Array<UserDTO>> {
+        let userDTOfoundsToReturn: Array<UserDTO> = new Array<UserDTO>();
+        let mongoSearcher = [];
+        try {
+            if (userSearcher.idCriteria !== null) {
+                mongoSearcher.push({[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userSearcher.idCriteria)});
+            }
+
+            if (userSearcher.usernameCriteria !== null) {
+                mongoSearcher.push({[DatabaseConstants.USERNAME_FIELD_NAME]:  {$regex : `.*${userSearcher.usernameCriteria}.*`}});
+            }
+
+            if (userSearcher.emailCriteria !== null) {
+                mongoSearcher.push({[DatabaseConstants.EMAIL_FIELD_NAME]: {$regex : `.*${userSearcher.emailCriteria}.*`}});
+            }
+
+            let userFoundCursor = await collectionReference.find({
+                $and: mongoSearcher
+            });
+
+            let arrayOfFoundedUsers = await userFoundCursor.toArray();
+
+            if (arrayOfFoundedUsers !== undefined && arrayOfFoundedUsers.length > 0) {
+                arrayOfFoundedUsers.map((userFound: UserDTO) => {
+                    userDTOfoundsToReturn.push(userFound);
+                });
+            }
+            return userDTOfoundsToReturn;
+
         } catch (Exception) {
             throw Exception;
         }

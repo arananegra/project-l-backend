@@ -3,6 +3,7 @@ import {UserDAO} from "../dao/UserDAO";
 import {UserDTO} from "../domain/UserDTO";
 import {DatabaseConstants} from "../constants/DatabaseConstants";
 import {DbConnectionBS} from "./DbConnectionBS";
+import {UserSearcher} from "../domain/searchers/UserSearcher";
 
 export class UserBS {
     private userDAO: UserDAO;
@@ -52,6 +53,21 @@ export class UserBS {
             const db: Db = await DbConnectionBS.getDbFromClient(client);
             const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
             return await this.userDAO.loginUser(usersCollection, userToVerify);
+        } catch (Exception) {
+            throw Exception;
+        }
+    }
+
+    public async getUsersBySearcher(userToSearch: UserSearcher): Promise<Array<UserDTO>> {
+        const client: Client = await DbConnectionBS.getClient()
+            .catch((clientException) => {
+                throw clientException;
+            });
+
+        try {
+            const db: Db = await DbConnectionBS.getDbFromClient(client);
+            const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
+            return await this.userDAO.getUsersBySearcher(usersCollection, userToSearch);
         } catch (Exception) {
             throw Exception;
         }
