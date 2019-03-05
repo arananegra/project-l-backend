@@ -8,24 +8,15 @@ export class UserDAO {
 
     private async checkIfUserExists(collectionReference: Collection, userSearcher: UserSearcher): Promise<UserDTO> {
         let userDTOfoundToReturn: UserDTO = null;
-        let mongodbFindUserByUsernameCriteria: string = null;
         let mongodbFindUserByEmailCriteria: string = null;
 
         try {
-
-            if (userSearcher.usernameCriteria !== null) {
-                mongodbFindUserByUsernameCriteria = userSearcher.usernameCriteria;
-            }
-
             if (userSearcher.emailCriteria !== null) {
                 mongodbFindUserByEmailCriteria = userSearcher.emailCriteria;
             }
 
             let userFoundCursor = await collectionReference.find({
-                $or: [
-                    {[DatabaseConstants.EMAIL_FIELD_NAME]: mongodbFindUserByEmailCriteria},
-                    {[DatabaseConstants.USERNAME_FIELD_NAME]: mongodbFindUserByUsernameCriteria}
-                ]
+                [DatabaseConstants.EMAIL_FIELD_NAME]: mongodbFindUserByEmailCriteria
             });
 
             let arrayOfFoundedUsers = await userFoundCursor.toArray();
@@ -91,11 +82,11 @@ export class UserDAO {
             }
 
             if (userSearcher.usernameCriteria !== null) {
-                mongoSearcher.push({[DatabaseConstants.USERNAME_FIELD_NAME]:  {$regex : `.*${userSearcher.usernameCriteria}.*`}});
+                mongoSearcher.push({[DatabaseConstants.USERNAME_FIELD_NAME]: {$regex: `.*${userSearcher.usernameCriteria}.*`}});
             }
 
             if (userSearcher.emailCriteria !== null) {
-                mongoSearcher.push({[DatabaseConstants.EMAIL_FIELD_NAME]: {$regex : `.*${userSearcher.emailCriteria}.*`}});
+                mongoSearcher.push({[DatabaseConstants.EMAIL_FIELD_NAME]: {$regex: `.*${userSearcher.emailCriteria}.*`}});
             }
 
             let userFoundCursor = await collectionReference.find({

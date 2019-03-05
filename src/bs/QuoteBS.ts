@@ -4,12 +4,17 @@ import {DatabaseConstants} from "../constants/DatabaseConstants";
 import {Client, Db, Collection} from "mongodb";
 import {QuoteDAO} from "../dao/QuoteDAO";
 import {UserDTO} from "../domain/UserDTO";
+import {UserBS} from "./UserBS";
+import {UserSearcher} from "../domain/searchers/UserSearcher";
+import {ErrorMessagesConstants} from "../constants/ErrorMessagesConstants";
 
 export class QuoteBS {
     private quoteDAO;
+    private userBS;
 
     constructor() {
         this.quoteDAO = new QuoteDAO();
+        this.userBS = new UserBS();
     }
 
     public async getRandomQuote(): Promise<QuoteDTO> {
@@ -34,9 +39,23 @@ export class QuoteBS {
             });
 
         try {
+            let quoteNonInUse = null;
             const db: Db = await DbConnectionBS.getDbFromClient(client);
             const quotesCollection = db.collection(DatabaseConstants.QUOTE_COLLECTION_NAME);
-            return await this.quoteDAO.getQuoteNonInUseByUser(quotesCollection, userToCheckUsedQuotes);
+            let userSearcher = new UserSearcher();
+            userSearcher.idCriteria = userToCheckUsedQuotes._id;
+            let userToCheckWithFilledFieldsArray = await this.userBS.getUsersBySearcher(userSearcher);
+            let singleUserCheckWithFilledField = userToCheckWithFilledFieldsArray[0];
+            if (singleUserCheckWithFilledField !== null && singleUserCheckWithFilledField !== undefined) {
+                if (singleUserCheckWithFilledField.alreadyUsedQuotes === null) {
+                    singleUserCheckWithFilledField.alreadyUsedQuotes = [];
+                }
+                quoteNonInUse = await this.quoteDAO.getQuoteNonInUseByUser(quotesCollection, singleUserCheckWithFilledField);
+            } else {
+                throw new Error(ErrorMessagesConstants.NO_USER_TO_SEARCH_QUOTES);
+            }
+
+            return quoteNonInUse;
         } catch (Exception) {
             throw Exception;
         }

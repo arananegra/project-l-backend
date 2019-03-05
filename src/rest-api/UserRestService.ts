@@ -90,16 +90,16 @@ export class UserRestService {
                         userSearcher.emailCriteria = request.query.email;
                     }
 
-                    let foundedUser = await userBS.getUsersBySearcher(userSearcher);
+                    let foundedUsers = await userBS.getUsersBySearcher(userSearcher);
 
-                    if (foundedUser !== null) {
-                        response.status(200).send(foundedUser);
+                    if (foundedUsers !== null) {
+                        response.status(200).send(foundedUsers);
                     } else {
                         response.status(404).send();
                     }
 
                 } catch (Exception) {
-                    console.log(Exception)
+                    console.log(Exception);
                     response.status(500).send(Exception);
                 }
             }

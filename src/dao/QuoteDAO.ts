@@ -11,16 +11,16 @@ export class QuoteDAO {
             let nonUsedQuoteByUser = null;
             let quotesIdsAlreadyUsed = [];
 
-            userToCheckUsedQuotes.alreadyUsedQuotes.map((singleQuoteObjectId: ObjectID) => {
-                quotesIdsAlreadyUsed.push({[DatabaseConstants.ID_FIELD_NAME]: singleQuoteObjectId})
-            });
-            let quotesCursor = await collectionReference.findOne({
-                $not: quotesIdsAlreadyUsed
+            userToCheckUsedQuotes.alreadyUsedQuotes.map((singleQuoteObjectId: number) => {
+                quotesIdsAlreadyUsed.push(new ObjectID(singleQuoteObjectId))
             });
 
-            let arrayOfFoundedQuotes = await quotesCursor.toArray();
-            if (arrayOfFoundedQuotes !== undefined && arrayOfFoundedQuotes.length > 0) {
-                nonUsedQuoteByUser = arrayOfFoundedQuotes[0];
+            let singleQuoteNotUsedFound = await collectionReference.findOne({
+                [DatabaseConstants.ID_FIELD_NAME]: {$nin: quotesIdsAlreadyUsed}
+            });
+
+            if (singleQuoteNotUsedFound !== undefined && singleQuoteNotUsedFound !== null) {
+                nonUsedQuoteByUser = singleQuoteNotUsedFound;
             }
             return nonUsedQuoteByUser;
 
