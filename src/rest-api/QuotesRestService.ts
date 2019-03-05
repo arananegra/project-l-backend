@@ -5,9 +5,7 @@ import {UserDTO} from "../domain/UserDTO";
 import {ExceptionConstants} from "../constants/ExceptionConstants";
 import {ExceptionDTO} from "../domain/ExceptionDTO";
 import {ServiceConstants} from "../constants/ServiceConstants";
-import {UserSearcher} from "../domain/searchers/UserSearcher";
 import {UserBS} from "../bs/UserBS";
-import {UserDAO} from "../dao/UserDAO";
 
 export class QuotesRestService {
     private app: any;
@@ -64,7 +62,8 @@ export class QuotesRestService {
 
                 } catch (Exception) {
                     if (Exception instanceof ExceptionDTO) {
-                        if (Exception.code === ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID) {
+                        if (Exception.code === ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID
+                            || Exception.code === ExceptionConstants.LAST_QUOTED_REQUIRED_DATE_IS_INVALID_ID) {
                             response.status(412).send(Exception);
                         }
                     } else {

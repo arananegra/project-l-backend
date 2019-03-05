@@ -140,8 +140,6 @@ export class UserDAO {
                 }
             );
 
-            console.log(result)
-
             return userToUpdate;
 
         } catch (Exception) {

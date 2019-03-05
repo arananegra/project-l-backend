@@ -10,8 +10,8 @@ import {ExceptionConstants} from "../constants/ExceptionConstants";
 import {ExceptionDTO} from "../domain/ExceptionDTO";
 
 export class QuoteBS {
-    private quoteDAO;
-    private userBS;
+    private quoteDAO: QuoteDAO;
+    private userBS: UserBS;
 
     constructor() {
         this.quoteDAO = new QuoteDAO();
@@ -48,12 +48,26 @@ export class QuoteBS {
             userSearcher.idCriteria = userToCheckUsedQuotes._id;
             let userToCheckWithFilledFieldsArray = await this.userBS.getUsersBySearcher(userSearcher);
             let singleUserCheckWithFilledField = userToCheckWithFilledFieldsArray[0];
-
+            let currentTimestamp = new Date().getTime();
             if (singleUserCheckWithFilledField !== null && singleUserCheckWithFilledField !== undefined) {
-                if (singleUserCheckWithFilledField.alreadyUsedQuotes === null) {
-                    singleUserCheckWithFilledField.alreadyUsedQuotes = [];
+                if (singleUserCheckWithFilledField.lastQuoteRequiredDate === null ||
+                    currentTimestamp - singleUserCheckWithFilledField.lastQuoteRequiredDate > DatabaseConstants.TWENTY_FOUR_HOURS_IN_MILISECONDS) {
+                    if (singleUserCheckWithFilledField.alreadyUsedQuotes === null) {
+                        singleUserCheckWithFilledField.alreadyUsedQuotes = [];
+                    }
+                    quoteNotInUse = await this.quoteDAO.getQuoteNotInUseByUser(quotesCollection, singleUserCheckWithFilledField);
+
+                    if (quoteNotInUse !== null) {
+                        let userDTOtoUpdateLastQuoteTime = new UserDTO();
+                        userDTOtoUpdateLastQuoteTime._id = singleUserCheckWithFilledField._id;
+                        userDTOtoUpdateLastQuoteTime.lastQuoteRequiredDate = currentTimestamp;
+                        userDTOtoUpdateLastQuoteTime.alreadyUsedQuotes = [...singleUserCheckWithFilledField.alreadyUsedQuotes, quoteNotInUse._id];
+                        await this.userBS.updateUser(userDTOtoUpdateLastQuoteTime);
+                    }
+
+                } else {
+                    throw new ExceptionDTO(ExceptionConstants.LAST_QUOTED_REQUIRED_DATE_IS_INVALID_ID, ExceptionConstants.LAST_QUOTED_REQUIRED_DATE_IS_INVALID_MESSAGE);
                 }
-                quoteNotInUse = await this.quoteDAO.getQuoteNotInUseByUser(quotesCollection, singleUserCheckWithFilledField);
             } else {
                 throw new ExceptionDTO(ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID, ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_MESSAGE);
             }
