@@ -41,7 +41,8 @@ export class QuotesRestService {
                 } catch (Exception) {
                     if (Exception instanceof ExceptionDTO) {
                         if (Exception.code === ExceptionConstants.NO_USER_TO_SEARCH_QUOTES_ID
-                            || Exception.code === ExceptionConstants.LAST_QUOTED_REQUIRED_DATE_IS_INVALID_ID) {
+                            || Exception.code === ExceptionConstants.LAST_QUOTED_REQUIRED_DATE_IS_INVALID_ID
+                            || Exception.code === ExceptionConstants.MONGO_ID_INVALID_ID) {
                             response.status(412).send(Exception);
                         }
                     } else {

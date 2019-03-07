@@ -11,4 +11,8 @@ export class ExceptionConstants {
     public static LAST_QUOTED_REQUIRED_DATE_IS_INVALID_MESSAGE: string = "The last quote required date is invalid: probably " +
         "the user has requested a new quote before 24h";
     public static LAST_QUOTED_REQUIRED_DATE_IS_INVALID_ID: number = -4;
+
+    public static MONGO_ID_INVALID_MESSAGE: string = "The mongo id is invalid";
+    public static MONGO_ID_INVALID_ID: number = -5;
+
 }

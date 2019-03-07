@@ -1,12 +1,26 @@
-import {ObjectID} from "mongodb";
+import {Field, ObjectType} from "type-graphql";
 
+@ObjectType()
 export class UserDTO {
-    public _id: ObjectID;
+    @Field()
+    public _id: string;
+
+    @Field({nullable: true})
+
+    @Field({nullable: true})
     public username: string;
+
+    @Field({nullable: true})
     public email: string;
+
+    @Field({nullable: true})
     public password: string;
+
+    @Field({nullable: true})
     public lastQuoteRequiredDate: number;
-    public alreadyUsedQuotes: Array<ObjectID>;
+
+    @Field(type => [String], {nullable: true})
+    public alreadyUsedQuotes: Array<string>;
 
     constructor() {
         this._id = null;

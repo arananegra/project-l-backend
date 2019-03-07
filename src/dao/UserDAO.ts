@@ -3,6 +3,8 @@ import {Collection, Db, Session, ObjectID} from "mongodb";
 import {UserDTO} from "../domain/UserDTO";
 import {DatabaseConstants} from "../constants/DatabaseConstants";
 import {UserSearcher} from "../domain/searchers/UserSearcher";
+import {ExceptionDTO} from "../domain/ExceptionDTO";
+import {ExceptionConstants} from "../constants/ExceptionConstants";
 
 export class UserDAO {
 
@@ -81,7 +83,11 @@ export class UserDAO {
         let mongoSearcher = [];
         try {
             if (userSearcher.idCriteria !== null) {
-                mongoSearcher.push({[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userSearcher.idCriteria)});
+                if (ObjectID.isValid(userSearcher.idCriteria)) {
+                    mongoSearcher.push({[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userSearcher.idCriteria)});
+                } else {
+                    throw new ExceptionDTO(ExceptionConstants.MONGO_ID_INVALID_ID, ExceptionConstants.MONGO_ID_INVALID_MESSAGE);
+                }
             }
 
             if (userSearcher.usernameCriteria !== null) {
@@ -114,33 +120,39 @@ export class UserDAO {
         try {
             let updateObject = {};
 
-            if (userToUpdate.username !== null) {
-                updateObject[DatabaseConstants.USERNAME_FIELD_NAME] = userToUpdate.username;
-            }
+            if (ObjectID.isValid(userToUpdate._id)) {
 
-            if (userToUpdate.email !== null) {
-                updateObject[DatabaseConstants.EMAIL_FIELD_NAME] = userToUpdate.email;
-            }
-
-            if (userToUpdate.password !== null) {
-                updateObject[DatabaseConstants.PASSWORD_FIELD_NAME] = await hash(userToUpdate.password, 10);
-            }
-
-            if (userToUpdate.alreadyUsedQuotes !== null) {
-                updateObject[DatabaseConstants.ALREADY_USED_QUOTES_FIELD_NAME] = userToUpdate.alreadyUsedQuotes
-            }
-
-            if (userToUpdate.lastQuoteRequiredDate !== null) {
-                updateObject[DatabaseConstants.LAST_QUOTED_REQUIRED_DATE_FIELD_NAME] = userToUpdate.lastQuoteRequiredDate
-            }
-            let result = await collectionReference.updateOne(
-                {[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userToUpdate._id)},
-                {
-                    $set: updateObject
+                if (userToUpdate.username !== null) {
+                    updateObject[DatabaseConstants.USERNAME_FIELD_NAME] = userToUpdate.username;
                 }
-            );
 
-            return userToUpdate;
+                if (userToUpdate.email !== null) {
+                    updateObject[DatabaseConstants.EMAIL_FIELD_NAME] = userToUpdate.email;
+                }
+
+                if (userToUpdate.password !== null) {
+                    updateObject[DatabaseConstants.PASSWORD_FIELD_NAME] = await hash(userToUpdate.password, 10);
+                }
+
+                if (userToUpdate.alreadyUsedQuotes !== null) {
+                    updateObject[DatabaseConstants.ALREADY_USED_QUOTES_FIELD_NAME] = userToUpdate.alreadyUsedQuotes
+                }
+
+                if (userToUpdate.lastQuoteRequiredDate !== null) {
+                    updateObject[DatabaseConstants.LAST_QUOTED_REQUIRED_DATE_FIELD_NAME] = userToUpdate.lastQuoteRequiredDate
+                }
+                let result = await collectionReference.updateOne(
+                    {[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userToUpdate._id)},
+                    {
+                        $set: updateObject
+                    },
+                    { w: "majority", wtimeout: 100 }
+                );
+                return userToUpdate;
+            } else {
+                throw new ExceptionDTO(ExceptionConstants.MONGO_ID_INVALID_ID, ExceptionConstants.MONGO_ID_INVALID_MESSAGE);
+            }
+
 
         } catch (Exception) {
             console.trace(Exception);

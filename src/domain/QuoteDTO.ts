@@ -1,7 +1,7 @@
-import {ObjectID} from "mongodb";
+
 
 export class QuoteDTO {
-    public _id: ObjectID;
+    public _id: string;
     public message: string;
 
     constructor() {

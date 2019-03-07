@@ -5,9 +5,18 @@ import * as express from "express";
 import * as helmet from "helmet";
 import "reflect-metadata";
 import * as jwt from "express-jwt"
+import {buildSchema} from "type-graphql";
 import * as jsonwebtoken from "jsonwebtoken";
 import {MainServices} from "./src/rest-api/MainServices";
 import {ServiceConstants} from "./src/constants/ServiceConstants";
+import {ApolloServer} from "apollo-server";
+import * as path from "path";
+import {AuthChecker} from "type-graphql/dist";
+export interface ExpressContext {
+    req: express.Request;
+    res: express.Response;
+}
+
 
 //Global variables declaration
 let app = express();
@@ -81,10 +90,43 @@ let server = app.listen(process.env.PORT || 3000, () => {
     console.log(`App Listening at http://${host}:${port}`);
 });
 
+const GRAPHQL_PORT = 3001;
+
+/*
+async function test(): Promise<void> {
+    try {
+        const schema = await buildSchema({
+            resolvers: [],
+            // automatically create `schema.gql` file with schema definition in current folder
+            emitSchemaFile: path.resolve("./", "schema.graphql")
+        });
+
+        // Create GraphQL server
+        const server = new ApolloServer({
+            schema,
+            context: (context: ExpressContext) => {
+                return context;
+            },
+        });
+
+        // Start the server
+        const {url} = await server.listen(GRAPHQL_PORT);
+        console.log(`Server is running, GraphQL Playground available at ${url}`);
+    } catch (e) {
+        console.log("error", e);
+    }
+}
+*/
 
 //Routes objects instantiation
 //let sumService = new MultiplyService(app);
 new MainServices(router);
+//
+// test().then(() => {
+//
+// }).catch((error) => console.log(error));
+
+
 
 //Export for testing purpose
 module.exports = app;

@@ -1,5 +1,5 @@
 export class DatabaseConstants {
-    public static TWENTY_FOUR_HOURS_IN_MILISECONDS: number = 86400000;
+    public static TWENTY_FOUR_HOURS_IN_MILISECONDS: number = 5000;
     public static DATABASE_NAME = "project-l-db";
     public static PROJECT_L_DATABASE_URL = process.env.PROJECT_L_DATABASE_URL;
 
