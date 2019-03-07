@@ -13,6 +13,7 @@ import {ApolloServer} from "apollo-server";
 import * as path from "path";
 import {UserResolver} from "./src/graphql/resolvers/UserResolver";
 import {authChecker} from "./src/graphql/JwtAuthBS";
+import {formatError} from "graphql";
 
 export interface ExpressContext {
     req: any;
@@ -103,6 +104,7 @@ async function test(): Promise<void> {
             emitSchemaFile: path.resolve("./", "schema.graphql"),
             validate: false,
             authChecker: authChecker
+
         });
 
         // Create GraphQL server
@@ -111,6 +113,11 @@ async function test(): Promise<void> {
             context: (context: ExpressContext) => {
                 return context;
             },
+            formatError: function (error) {
+                let  custom = (error.originalError);
+                console.log(custom)
+                return error
+            }
         });
 
         // Start the server

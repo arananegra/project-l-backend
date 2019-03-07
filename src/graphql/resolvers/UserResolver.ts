@@ -5,6 +5,8 @@ import {UserBS} from "../../bs/UserBS";
 import * as jsonwebtoken from "jsonwebtoken";
 import {ServiceConstants} from "../../constants/ServiceConstants";
 import {ExpressContext} from "../../../index";
+import {ExceptionDTO} from "../../domain/ExceptionDTO";
+import {ExceptionConstants} from "../../constants/ExceptionConstants";
 
 @Resolver(of => UserDTO)
 export class UserResolver {
@@ -28,9 +30,23 @@ export class UserResolver {
             );
             ctx.res.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
         }
-
         return resultOfLoginUser;
-
     }
 
+
+    @Mutation(returns => UserDTO, {nullable: true})
+    async register(@Arg("userToRegister", {nullable: true}) userToRegister: UserDTO, @Ctx() ctx: ExpressContext) {
+        let userBS = new UserBS();
+        let resultOfRegisterUser = await userBS.registerNewUser(userToRegister);
+        if (resultOfRegisterUser !== null) {
+            let token = jsonwebtoken.sign({"email": userToRegister.email}, ServiceConstants.TOKEN_SECRET, {
+                    expiresIn: '1h' //1h, 2d ...
+                }
+            );
+            ctx.res.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
+            return resultOfRegisterUser;
+        } else {
+            throw new ExceptionDTO(ExceptionConstants.USER_ALREADY_EXISTS_ID, ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE);
+        }
+    }
 }
