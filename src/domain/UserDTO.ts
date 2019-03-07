@@ -1,6 +1,7 @@
-import {Field, ObjectType} from "type-graphql";
+import {Field, InputType, ObjectType} from "type-graphql";
 
-@ObjectType()
+@ObjectType("UserType")
+@InputType("UserInput")
 export class UserDTO {
     @Field()
     public _id: string;
@@ -10,10 +11,10 @@ export class UserDTO {
     @Field({nullable: true})
     public username: string;
 
-    @Field({nullable: true})
+    @Field({nullable: false})
     public email: string;
 
-    @Field({nullable: true})
+    @Field({nullable: false})
     public password: string;
 
     @Field({nullable: true})
@@ -25,8 +26,8 @@ export class UserDTO {
     constructor() {
         this._id = null;
         this.username = null;
-        this.email = null;
-        this.password = null;
+        this.email = undefined;
+        this.password = undefined;
         this.lastQuoteRequiredDate = null;
         this.alreadyUsedQuotes = null;
     }

@@ -4,20 +4,30 @@
 # -----------------------------------------------
 
 type Query {
-  searchUser(userSearcher: UserSearcher): [UserDTO!]
+  searchUser(userSearcher: UserSearcher): [UserType!]
+  login(userToLogin: UserInput): UserType
 }
 
-type UserDTO {
-  _id: String!
-  username: String
-  email: String
-  password: String
-  lastQuoteRequiredDate: Float
-  alreadyUsedQuotes: [String!]
+input UserInput {
+  _id: String = null
+  username: String = null
+  email: String!
+  password: String!
+  lastQuoteRequiredDate: Float = null
+  alreadyUsedQuotes: [String!] = null
 }
 
 input UserSearcher {
   usernameCriteria: String = null
   emailCriteria: String = null
   idCriteria: String = null
+}
+
+type UserType {
+  _id: String!
+  username: String
+  email: String!
+  password: String!
+  lastQuoteRequiredDate: Float
+  alreadyUsedQuotes: [String!]
 }

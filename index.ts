@@ -12,10 +12,11 @@ import {ServiceConstants} from "./src/constants/ServiceConstants";
 import {ApolloServer} from "apollo-server";
 import * as path from "path";
 import {UserResolver} from "./src/graphql/resolvers/UserResolver";
+import {authChecker} from "./src/graphql/JwtAuthBS";
 
 export interface ExpressContext {
-    req: express.Request;
-    res: express.Response;
+    req: any;
+    res: any;
 }
 
 
@@ -100,7 +101,8 @@ async function test(): Promise<void> {
             resolvers: [UserResolver],
             // automatically create `schema.gql` file with schema definition in current folder
             emitSchemaFile: path.resolve("./", "schema.graphql"),
-            validate: false
+            validate: false,
+            authChecker: authChecker
         });
 
         // Create GraphQL server
