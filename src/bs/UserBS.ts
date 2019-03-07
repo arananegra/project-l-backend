@@ -58,7 +58,7 @@ export class UserBS {
         }
     }
 
-    public async getUsersBySearcher(userToSearch: UserSearcher): Promise<Array<UserDTO>> {
+    public async searchUser(userSearcher: UserSearcher): Promise<Array<UserDTO>> {
         const client: Client = await DbConnectionBS.getClient()
             .catch((clientException) => {
                 throw clientException;
@@ -67,7 +67,7 @@ export class UserBS {
         try {
             const db: Db = await DbConnectionBS.getDbFromClient(client);
             const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
-            return await this.userDAO.getUsersBySearcher(usersCollection, userToSearch);
+            return await this.userDAO.searchUser(usersCollection, userSearcher);
         } catch (Exception) {
             throw Exception;
         }

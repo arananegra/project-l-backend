@@ -92,7 +92,7 @@ export class UserRestService {
                         userSearcher.emailCriteria = request.query.email;
                     }
 
-                    let foundedUsers = await userBS.getUsersBySearcher(userSearcher);
+                    let foundedUsers = await userBS.searchUser(userSearcher);
 
                     if (foundedUsers !== null) {
                         response.status(200).send(foundedUsers);

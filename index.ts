@@ -11,7 +11,8 @@ import {MainServices} from "./src/rest-api/MainServices";
 import {ServiceConstants} from "./src/constants/ServiceConstants";
 import {ApolloServer} from "apollo-server";
 import * as path from "path";
-import {AuthChecker} from "type-graphql/dist";
+import {UserResolver} from "./src/graphql/resolvers/UserResolver";
+
 export interface ExpressContext {
     req: express.Request;
     res: express.Response;
@@ -92,13 +93,14 @@ let server = app.listen(process.env.PORT || 3000, () => {
 
 const GRAPHQL_PORT = 3001;
 
-/*
+
 async function test(): Promise<void> {
     try {
         const schema = await buildSchema({
-            resolvers: [],
+            resolvers: [UserResolver],
             // automatically create `schema.gql` file with schema definition in current folder
-            emitSchemaFile: path.resolve("./", "schema.graphql")
+            emitSchemaFile: path.resolve("./", "schema.graphql"),
+            validate: false
         });
 
         // Create GraphQL server
@@ -116,17 +118,12 @@ async function test(): Promise<void> {
         console.log("error", e);
     }
 }
-*/
 
-//Routes objects instantiation
-//let sumService = new MultiplyService(app);
 new MainServices(router);
-//
-// test().then(() => {
-//
-// }).catch((error) => console.log(error));
 
+test().then(() => {
 
+}).catch((error) => console.log(error));
 
 //Export for testing purpose
 module.exports = app;

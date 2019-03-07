@@ -2,7 +2,6 @@ import {AuthChecker} from "type-graphql";
 import * as jsonwebtoken from "jsonwebtoken";
 import {ExpressContext} from "../../index";
 import {ServiceConstants} from "../constants/ServiceConstants";
-import * as express from "express";
 
 
 export const authChecker: AuthChecker<ExpressContext> = async ({context: ExpressContext}) => {

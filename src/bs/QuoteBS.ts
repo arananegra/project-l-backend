@@ -30,7 +30,7 @@ export class QuoteBS {
             const quotesCollection = db.collection(DatabaseConstants.QUOTE_COLLECTION_NAME);
             let userSearcher = new UserSearcher();
             userSearcher.idCriteria = userToCheckUsedQuotes._id;
-            let userToCheckWithFilledFieldsArray = await this.userBS.getUsersBySearcher(userSearcher);
+            let userToCheckWithFilledFieldsArray = await this.userBS.searchUser(userSearcher);
             let singleUserCheckWithFilledField = userToCheckWithFilledFieldsArray[0];
             let currentTimestamp = new Date().getTime();
 

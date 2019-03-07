@@ -78,7 +78,7 @@ export class UserDAO {
         }
     }
 
-    public async getUsersBySearcher(collectionReference: Collection, userSearcher: UserSearcher): Promise<Array<UserDTO>> {
+    public async searchUser(collectionReference: Collection, userSearcher: UserSearcher): Promise<Array<UserDTO>> {
         let userDTOfoundsToReturn: Array<UserDTO> = new Array<UserDTO>();
         let mongoSearcher = [];
         try {
