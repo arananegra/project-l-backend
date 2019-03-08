@@ -14,6 +14,7 @@ import * as path from "path";
 import {UserResolver} from "./src/graphql/resolvers/UserResolver";
 import {authChecker} from "./src/graphql/JwtAuthBS";
 import {formatError} from "graphql";
+import {QuoteResolver} from "./src/graphql/resolvers/QuoteResolver";
 
 export interface ExpressContext {
     req: any;
@@ -107,7 +108,7 @@ const GRAPHQL_PORT = 3001;
 async function test(): Promise<void> {
     try {
         const schema = await buildSchema({
-            resolvers: [UserResolver],
+            resolvers: [UserResolver, QuoteResolver],
             // automatically create `schema.gql` file with schema definition in current folder
             emitSchemaFile: path.resolve("./", "schema.graphql"),
             validate: false,
@@ -120,11 +121,6 @@ async function test(): Promise<void> {
             schema,
             context: (context: ExpressContext) => {
                 return context;
-            },
-            formatError: function (error) {
-                let  custom = (error.originalError);
-                console.log(custom)
-                return error
             }
         });
 

@@ -3,18 +3,9 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-input BlogInput {
-  _id: Float = null
-  blogName: String = null
-}
-
-type BlogType {
-  _id: Float
-  blogName: String
-}
-
 type Mutation {
   register(userToRegister: UserInput): UserType
+  getNewQuoteForUser(userRequesting: UserInput): QuoteDTO
 }
 
 type Query {
@@ -22,14 +13,18 @@ type Query {
   login(userToLogin: UserInput): UserType
 }
 
+type QuoteDTO {
+  _id: String!
+  message: String
+}
+
 input UserInput {
   _id: String = null
   username: String = null
-  email: String!
-  password: String!
+  email: String = null
+  password: String = null
   lastQuoteRequiredDate: Float = null
   alreadyUsedQuotes: [String!] = null
-  blogsOfUser: [BlogInput!] = null
 }
 
 input UserSearcher {
@@ -41,9 +36,8 @@ input UserSearcher {
 type UserType {
   _id: String!
   username: String
-  email: String!
-  password: String!
+  email: String
+  password: String
   lastQuoteRequiredDate: Float
   alreadyUsedQuotes: [String!]
-  blogsOfUser(blogSearcher: BlogInput): [BlogType!]
 }

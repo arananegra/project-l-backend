@@ -35,7 +35,8 @@ export class QuotesRestService {
                     if (notUsedQuote !== null) {
                         response.status(200).send(notUsedQuote);
                     } else {
-                        response.status(404).send();
+                        response.status(404).send(new ExceptionDTO(ExceptionConstants.NO_AVAILABLE_QUOTES_FOUND_FOR_USER__ID,
+                            ExceptionConstants.NO_AVAILABLE_QUOTES_FOUND_FOR_USER_MESSAGE));
                     }
 
                 } catch (Exception) {
