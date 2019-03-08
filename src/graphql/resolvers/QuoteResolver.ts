@@ -17,9 +17,7 @@ export class QuoteResolver {
             throw new ExceptionDTO(ExceptionConstants.MISSING_ID_FIELD_ID, ExceptionConstants.MISSING_ID_FIELD_MESSAGE);
         } else {
             notUsedQuote = await quoteBS.getQuoteNotInUseByUser(userRequesting);
-            if (notUsedQuote !== null) {
-                return notUsedQuote;
-            } else {
+            if (notUsedQuote === null) {
                 throw new ExceptionDTO(ExceptionConstants.NO_AVAILABLE_QUOTES_FOUND_FOR_USER__ID,
                     ExceptionConstants.NO_AVAILABLE_QUOTES_FOUND_FOR_USER_MESSAGE)
             }
