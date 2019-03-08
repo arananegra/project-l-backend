@@ -7,8 +7,6 @@ export class UserDTO {
     public _id: string;
 
     @Field({nullable: true})
-
-    @Field({nullable: true})
     public username: string;
 
     @Field({nullable: false})

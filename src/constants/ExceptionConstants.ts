@@ -15,4 +15,7 @@ export class ExceptionConstants {
     public static MONGO_ID_INVALID_MESSAGE: string = "The mongo id is invalid";
     public static MONGO_ID_INVALID_ID: number = -5;
 
+    public static WRONG_CREDENTIALS_PROVIDED_MESSAGE: string = "The provided credentials to the login request are invalid";
+    public static WRONG_CREDENTIALS_PROVIDED_ID: number = -6;
+
 }

@@ -29,8 +29,11 @@ export class UserResolver {
                 }
             );
             ctx.res.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
+            return resultOfLoginUser;
+        } else {
+            throw new ExceptionDTO(ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_ID,
+                ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_MESSAGE)
         }
-        return resultOfLoginUser;
     }
 
 
@@ -40,7 +43,7 @@ export class UserResolver {
         let resultOfRegisterUser = await userBS.registerNewUser(userToRegister);
         if (resultOfRegisterUser !== null) {
             let token = jsonwebtoken.sign({"email": userToRegister.email}, ServiceConstants.TOKEN_SECRET, {
-                    expiresIn: '1h' //1h, 2d ...
+                    expiresIn: '1h'
                 }
             );
             ctx.res.header(ServiceConstants.BEARER_NAME_CONSTANT, token);

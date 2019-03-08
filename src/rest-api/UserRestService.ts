@@ -37,7 +37,8 @@ export class UserRestService {
                         response.header(ServiceConstants.BEARER_NAME_CONSTANT, token);
                         response.status(200).send(resultOfLoginUser);
                     } else {
-                        response.status(401).send("Wrong credentials provided");
+                        response.status(401).send(new ExceptionDTO(ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_ID,
+                            ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_MESSAGE));
                     }
 
                 } catch (Exception) {

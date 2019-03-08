@@ -93,6 +93,14 @@ let server = app.listen(process.env.PORT || 3000, () => {
     console.log(`App Listening at http://${host}:${port}`);
 });
 
+
+// **********************
+// *                    *
+// *     GRAPQH QL      *
+// *                    *
+// **********************
+
+
 const GRAPHQL_PORT = 3001;
 
 
