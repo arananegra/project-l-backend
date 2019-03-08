@@ -3,6 +3,16 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+input BlogInput {
+  _id: Float = null
+  blogName: String = null
+}
+
+type BlogType {
+  _id: Float
+  blogName: String
+}
+
 type Mutation {
   register(userToRegister: UserInput): UserType
 }
@@ -19,6 +29,7 @@ input UserInput {
   password: String!
   lastQuoteRequiredDate: Float = null
   alreadyUsedQuotes: [String!] = null
+  blogsOfUser: [BlogInput!] = null
 }
 
 input UserSearcher {
@@ -34,4 +45,5 @@ type UserType {
   password: String!
   lastQuoteRequiredDate: Float
   alreadyUsedQuotes: [String!]
+  blogsOfUser(blogSearcher: BlogInput): [BlogType!]
 }

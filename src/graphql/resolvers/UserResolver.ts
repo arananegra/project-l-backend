@@ -7,6 +7,8 @@ import {ServiceConstants} from "../../constants/ServiceConstants";
 import {ExpressContext} from "../../../index";
 import {ExceptionDTO} from "../../domain/ExceptionDTO";
 import {ExceptionConstants} from "../../constants/ExceptionConstants";
+import {BlogDTO} from "../../domain/BlogDTO";
+import {ObjectID} from "mongodb";
 
 @Resolver(of => UserDTO)
 export class UserResolver {
@@ -51,5 +53,28 @@ export class UserResolver {
         } else {
             throw new ExceptionDTO(ExceptionConstants.USER_ALREADY_EXISTS_ID, ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE);
         }
+    }
+
+    @FieldResolver(of => UserDTO)
+    async blogsOfUser(@Root() user: UserDTO, @Arg("blogSearcher", {nullable: true}) blogSearcher: BlogDTO) {
+        let blogs = [];
+        let blog1 = new BlogDTO();
+        blog1._id = 1;
+        blog1.blogName = "Prueba de blog 1";
+
+        let blog2 = new BlogDTO();
+        blog2._id = 2;
+        blog2.blogName = "Prueba de blog 2";
+        blogs.push(blog1);
+        blogs.push(blog2);
+
+        if (blogSearcher !== undefined) {
+            let blogsOfUserById = blogs.filter(singleBlog => {
+                return singleBlog._id === blogSearcher._id
+            })
+
+            blogs = blogsOfUserById;
+        }
+        return blogs;
     }
 }

@@ -1,4 +1,5 @@
 import {Field, InputType, ObjectType} from "type-graphql";
+import {BlogDTO} from "./BlogDTO";
 
 @ObjectType("UserType")
 @InputType("UserInput")
@@ -21,6 +22,9 @@ export class UserDTO {
     @Field(type => [String], {nullable: true})
     public alreadyUsedQuotes: Array<string>;
 
+    @Field(type => [BlogDTO], {nullable: true})
+    public blogsOfUser: BlogDTO[];
+
     constructor() {
         this._id = null;
         this.username = null;
@@ -28,5 +32,6 @@ export class UserDTO {
         this.password = undefined;
         this.lastQuoteRequiredDate = null;
         this.alreadyUsedQuotes = null;
+        this.blogsOfUser = null;
     }
 }
