@@ -1,15 +1,15 @@
 let path = require('path');
 let basePath = __dirname;
-//let nodeExternals = require('webpack-node-externals');
 let CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
     context: path.join(basePath, 'src'),
     resolve: {
+        mainFields: ['browser', 'main', 'module'],
         extensions: ['.ts', '.tsx', '.js', '.jsx']
     },
     target: "node",
-    //externals: ["bcrypt"],
+    externals: ["bcrypt"],
 
     node: {
         fs: "empty",
@@ -34,11 +34,6 @@ module.exports = {
                 use: [{
                     loader: 'ts-loader'
                 }]
-            },
-            {
-                test: /\.json$/,
-                exclude: /node_modules/,
-                loader: 'json-loader',
             },
             {
                 test: /\.json$/,

@@ -27,6 +27,7 @@ export class MongoDBConnectionDAO {
             }
 
         } catch (Exception) {
+            console.trace(Exception)
             throw Exception;
         }
     }

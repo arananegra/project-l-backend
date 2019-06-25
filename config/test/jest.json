@@ -1,0 +1,16 @@
+{
+    "rootDir": "../../",
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
+    },
+    "testEnvironment": "node",
+    "restoreMocks": true,
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|svg)$": "<rootDir>/config/test/fileMock.js",
+      "^.+\\.(s?css|less)$": "identity-obj-proxy"
+    }
+  }
+  

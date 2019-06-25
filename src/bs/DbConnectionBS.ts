@@ -39,8 +39,8 @@ export class DbConnectionBS {
             await session.commitTransaction();
         } catch (Exception) {
             if (
-                Exception.errorLabels &&
-                Exception.errorLabels.indexOf('UnknownTransactionCommitResult') >= 0
+              Exception.errorLabels &&
+              Exception.errorLabels.indexOf('UnknownTransactionCommitResult') >= 0
             ) {
                 console.log('UnknownTransactionCommitResult, retrying commit operation ...');
                 await this.commitWithRetry(session);

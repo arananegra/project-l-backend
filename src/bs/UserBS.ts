@@ -1,9 +1,9 @@
-import {Client, Db, Session} from "mongodb";
-import {UserDAO} from "../dao/UserDAO";
-import {UserDTO} from "../domain/UserDTO";
-import {DatabaseConstants} from "../constants/DatabaseConstants";
-import {DbConnectionBS} from "./DbConnectionBS";
-import {UserSearcher} from "../domain/searchers/UserSearcher";
+import { compare, hash } from "bcryptjs";
+import { ExceptionConstants } from "../constants/ExceptionConstants";
+import { UserDAO } from "../dao/UserDAO";
+import { ExceptionDTO } from "../domain/ExceptionDTO";
+import { UserSearcher } from "../domain/searchers/UserSearcher";
+import { UserDTO } from "../domain/UserDTO";
 
 export class UserBS {
     private userDAO: UserDAO;
@@ -13,78 +13,68 @@ export class UserBS {
     }
 
     public async registerNewUser(userToInsert: UserDTO): Promise<UserDTO> {
-        const client: Client = await DbConnectionBS.getClient()
-            .catch((clientException) => {
-                throw clientException;
-            });
-        const session = client.startSession({readPreference: {mode: "primary"}});
         try {
-            const db: Db = await DbConnectionBS.getDbFromClient(client);
-            db.createCollection(DatabaseConstants.USER_COLLECTION_NAME);
-            const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
-            session.startTransaction({
-                readConcern: {level: 'snapshot'},
-                writeConcern: {w: 'majority'},
-                readPreference: 'primary'
-            });
+            if (userToInsert.password === undefined || userToInsert.password === null) {
+                throw new ExceptionDTO(ExceptionConstants.NO_PASSWORD_PROVIDED_ID, ExceptionConstants.NO_PASSWORD_PROVIDED_MESSAGE)
+            }
+            let userSearcherToCheckIfExists = new UserSearcher();
+            userSearcherToCheckIfExists.emailCriteria = userToInsert.email;
+            userSearcherToCheckIfExists.usernameCriteria = userToInsert.username;
 
-            let userRegistered = await this.userDAO.registerNewUser(usersCollection, userToInsert, session);
-            await DbConnectionBS.commitWithRetry(session);
+            let userThatExists = await this.userDAO.searchUser(userSearcherToCheckIfExists, false);
+
+            if (userThatExists !== null) {
+                throw new ExceptionDTO(ExceptionConstants.USER_ALREADY_EXISTS_ID, ExceptionConstants.USER_ALREADY_EXISTS_MESSAGE);
+            }
+
+            userToInsert.password = await hash(userToInsert.password, 10);
+
+            let userRegistered = await this.userDAO.registerNewUser(userToInsert);
             return userRegistered;
 
         } catch (Exception) {
-            if (Exception.errorLabels && Exception.errorLabels.indexOf('TransientTransactionError') >= 0) {
-                console.log('TransientTransactionError, retrying transaction ...');
-                await this.registerNewUser(userToInsert);
-            } else {
-                await session.abortTransaction();
-                throw Exception;
-            }
+            throw Exception;
         }
     }
 
     public async loginUser(userToVerify: UserDTO): Promise<UserDTO> {
-        const client: Client = await DbConnectionBS.getClient()
-            .catch((clientException) => {
-                throw clientException;
-            });
-
         try {
-            const db: Db = await DbConnectionBS.getDbFromClient(client);
-            const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
-            return await this.userDAO.loginUser(usersCollection, userToVerify);
+            let userSearcherToCheckIfExists = new UserSearcher();
+            userSearcherToCheckIfExists.emailCriteria = userToVerify.email;
+            userSearcherToCheckIfExists.usernameCriteria = userToVerify.username;
+
+
+            let usersFromDb = await this.userDAO.searchUser(userSearcherToCheckIfExists);
+            let singleUserFromDB = usersFromDb[0];
+            if (singleUserFromDB !== null) {
+                let compareResult = await compare(userToVerify.password, singleUserFromDB.password);
+                if (compareResult) {
+                    return singleUserFromDB;
+                } else {
+                    throw new ExceptionDTO(ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_ID,
+                      ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_MESSAGE);
+                }
+            } else {
+                throw new ExceptionDTO(ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_ID,
+                  ExceptionConstants.WRONG_CREDENTIALS_PROVIDED_MESSAGE);
+            }
         } catch (Exception) {
             throw Exception;
         }
     }
 
     public async searchUser(userSearcher: UserSearcher): Promise<Array<UserDTO>> {
-        const client: Client = await DbConnectionBS.getClient()
-            .catch((clientException) => {
-                throw clientException;
-            });
-
         try {
-            const db: Db = await DbConnectionBS.getDbFromClient(client);
-            const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
-            return await this.userDAO.searchUser(usersCollection, userSearcher);
+            return await this.userDAO.searchUser(userSearcher);
         } catch (Exception) {
             throw Exception;
         }
     }
 
     public async updateUser(userToUpdate: UserDTO): Promise<UserDTO> {
-        const client: Client = await DbConnectionBS.getClient()
-            .catch((clientException) => {
-                throw clientException;
-            });
-
         try {
-            const db: Db = await DbConnectionBS.getDbFromClient(client);
-            const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
-            return await this.userDAO.updateUser(usersCollection, userToUpdate);
+            return await this.userDAO.updateUser(userToUpdate);
         } catch (Exception) {
-            console.trace(Exception);
             throw Exception;
         }
     }

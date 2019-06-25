@@ -9,6 +9,7 @@ module.exports = {
         // .js is required for react imports.
         // .tsx is for our app entry point.
         // .ts is optional, in case you will be importing any regular ts files.
+        mainFields: ['browser', 'main', 'module'],
         extensions: ['.ts', '.tsx', '.js', '.jsx']
     },
     target: "node",
@@ -44,11 +45,6 @@ module.exports = {
                 loader: 'json-loader',
             },
             {
-                test: /\.json$/,
-                exclude: /node_modules/,
-                loader: 'json-loader',
-            },
-            {
                 test: /\.(html)$/,
                 exclude: /node_modules/,
                 loader: 'html-loader'
@@ -60,6 +56,6 @@ module.exports = {
         ],
     },
     plugins: [
-        new NodemonPlugin(), // Dong
+        new NodemonPlugin()
     ],
 };

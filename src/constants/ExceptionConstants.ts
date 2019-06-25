@@ -18,7 +18,9 @@ export class ExceptionConstants {
     public static WRONG_CREDENTIALS_PROVIDED_MESSAGE: string = "The provided credentials to the login request are invalid";
     public static WRONG_CREDENTIALS_PROVIDED_ID: number = -6;
 
-    public static NO_AVAILABLE_QUOTES_FOUND_FOR_USER_MESSAGE: string = "No available quotes found for user";
-    public static NO_AVAILABLE_QUOTES_FOUND_FOR_USER__ID: number = -7;
+    public static NO_PASSWORD_PROVIDED_MESSAGE: string = "No password provided to user register";
+    public static NO_PASSWORD_PROVIDED_ID: number = -7;
 
+    public static NO_AVAILABLE_QUOTES_FOUND_FOR_USER_MESSAGE: string = "No available quotes found for user";
+    public static NO_AVAILABLE_QUOTES_FOUND_FOR_USER__ID: number = -8;
 }

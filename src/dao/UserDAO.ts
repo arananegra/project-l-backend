@@ -1,109 +1,59 @@
-import {compare, hash} from "bcryptjs"
-import {Collection, Db, Session, ObjectID} from "mongodb";
-import {UserDTO} from "../domain/UserDTO";
-import {DatabaseConstants} from "../constants/DatabaseConstants";
-import {UserSearcher} from "../domain/searchers/UserSearcher";
-import {ExceptionDTO} from "../domain/ExceptionDTO";
-import {ExceptionConstants} from "../constants/ExceptionConstants";
+import { Client, Db, ObjectID } from "mongodb";
+import { DbConnectionBS } from "../bs/DbConnectionBS";
+import { DatabaseConstants } from "../constants/DatabaseConstants";
+import { ExceptionConstants } from "../constants/ExceptionConstants";
+import { ExceptionDTO } from "../domain/ExceptionDTO";
+import { UserSearcher } from "../domain/searchers/UserSearcher";
+import { UserDTO } from "../domain/UserDTO";
+import { hash } from "bcryptjs";
 
 export class UserDAO {
 
-    private async checkIfUserExists(collectionReference: Collection, userSearcher: UserSearcher): Promise<UserDTO> {
-        let userDTOfoundToReturn: UserDTO = null;
-        let mongodbFindUserByEmailCriteria: string = null;
-
+    public async registerNewUser(userToInsert: UserDTO): Promise<UserDTO> {
         try {
-            if (userSearcher.emailCriteria !== null) {
-                mongodbFindUserByEmailCriteria = userSearcher.emailCriteria;
-            }
-
-            let userFoundCursor = await collectionReference.find({
-                [DatabaseConstants.EMAIL_FIELD_NAME]: mongodbFindUserByEmailCriteria
-            });
-
-            let arrayOfFoundedUsers = await userFoundCursor.toArray();
-
-            if (arrayOfFoundedUsers !== undefined && arrayOfFoundedUsers.length > 0) {
-                arrayOfFoundedUsers.map((userFound: UserDTO) => {
-                    userDTOfoundToReturn = new UserDTO();
-                    userDTOfoundToReturn = {...userDTOfoundToReturn, ...userFound};
-                });
-            }
-            return userDTOfoundToReturn;
-
+            const usersCollection = await this.getUserCollection();
+            let response = await usersCollection.insertOne(userToInsert);
+            return response.ops[0];
         } catch (Exception) {
             console.trace(Exception);
             throw Exception;
         }
     }
 
-    public async registerNewUser(collectionReference: Collection, userToInsert: UserDTO, session?: Session): Promise<UserDTO> {
-        try {
-            let userSearcherFromNewInsertRequest = new UserSearcher();
-            userSearcherFromNewInsertRequest.usernameCriteria = userToInsert.username;
-            userSearcherFromNewInsertRequest.emailCriteria = userToInsert.email;
-            let userFromDb = await this.checkIfUserExists(collectionReference, userSearcherFromNewInsertRequest);
-            if (userFromDb === null) {
-                userToInsert.password = await hash(userToInsert.password, 10);
-                let response = await collectionReference.insertOne(userToInsert, {session});
-                return response.ops[0];
-            } else {
-                return null;
-            }
-        } catch (Exception) {
-            console.trace(Exception);
-            throw Exception;
-        }
-    }
-
-    public async loginUser(collectionReference: Collection, userToVerify: UserDTO): Promise<UserDTO> {
-        try {
-            let userSearcherFromNewInsertRequest = new UserSearcher();
-            userSearcherFromNewInsertRequest.usernameCriteria = userToVerify.username;
-            userSearcherFromNewInsertRequest.emailCriteria = userToVerify.email;
-            let userFromDb = await this.checkIfUserExists(collectionReference, userSearcherFromNewInsertRequest);
-            if (userFromDb !== null) {
-                let compareResult = await compare(userToVerify.password, userFromDb.password);
-                if (compareResult) {
-                    return userFromDb;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } catch (Exception) {
-            console.trace(Exception);
-            throw Exception;
-        }
-    }
-
-    public async searchUser(collectionReference: Collection, userSearcher: UserSearcher): Promise<Array<UserDTO>> {
-        let userDTOfoundsToReturn: Array<UserDTO> = new Array<UserDTO>();
+    public async searchUser(userSearcher: UserSearcher, fullMatch?: boolean): Promise<Array<UserDTO>> {
+        let userDTOfoundsToReturn: Array<UserDTO> = null;
         let mongoSearcher = [];
+
+        const usersCollection = await this.getUserCollection();
+
         try {
             if (userSearcher.idCriteria !== null) {
                 if (ObjectID.isValid(userSearcher.idCriteria)) {
-                    mongoSearcher.push({[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userSearcher.idCriteria)});
+                    mongoSearcher.push({ [DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userSearcher.idCriteria) });
                 } else {
                     throw new ExceptionDTO(ExceptionConstants.MONGO_ID_INVALID_ID, ExceptionConstants.MONGO_ID_INVALID_MESSAGE);
                 }
             }
 
             if (userSearcher.usernameCriteria !== null) {
-                mongoSearcher.push({[DatabaseConstants.USERNAME_FIELD_NAME]: {$regex: `.*${userSearcher.usernameCriteria}.*`}});
+                mongoSearcher.push({ [DatabaseConstants.USERNAME_FIELD_NAME]: { $regex: `.*${userSearcher.usernameCriteria}.*` } });
             }
 
             if (userSearcher.emailCriteria !== null) {
-                mongoSearcher.push({[DatabaseConstants.EMAIL_FIELD_NAME]: {$regex: `.*${userSearcher.emailCriteria}.*`}});
+                mongoSearcher.push({ [DatabaseConstants.EMAIL_FIELD_NAME]: { $regex: `.*${userSearcher.emailCriteria}.*` } });
             }
-
-            let userFoundCursor = await collectionReference.find({
-                $and: mongoSearcher
-            });
+            let userFoundCursor;
+            fullMatch ?
+              userFoundCursor = await usersCollection.find({
+                  $and: mongoSearcher
+              }) :
+              userFoundCursor = await usersCollection.find({
+                  $or: mongoSearcher
+              })
 
             let arrayOfFoundedUsers = await userFoundCursor.toArray();
             if (arrayOfFoundedUsers !== undefined && arrayOfFoundedUsers.length > 0) {
+                userDTOfoundsToReturn = new Array<UserDTO>();
                 arrayOfFoundedUsers.map((userFound: UserDTO) => {
                     userDTOfoundsToReturn.push(userFound);
                 });
@@ -116,10 +66,10 @@ export class UserDAO {
         }
     }
 
-    public async updateUser(collectionReference: Collection, userToUpdate: UserDTO): Promise<UserDTO> {
+    public async updateUser(userToUpdate: UserDTO): Promise<UserDTO> {
         try {
             let updateObject = {};
-
+            const usersCollection = await this.getUserCollection();
             if (ObjectID.isValid(userToUpdate._id)) {
 
                 if (userToUpdate.username !== null) {
@@ -141,12 +91,13 @@ export class UserDAO {
                 if (userToUpdate.lastQuoteRequiredDate !== null) {
                     updateObject[DatabaseConstants.LAST_QUOTED_REQUIRED_DATE_FIELD_NAME] = userToUpdate.lastQuoteRequiredDate
                 }
-                let result = await collectionReference.updateOne(
-                    {[DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userToUpdate._id)},
-                    {
-                        $set: updateObject
-                    },
-                    { w: "majority", wtimeout: 100 }
+
+                await usersCollection.updateOne(
+                  { [DatabaseConstants.ID_FIELD_NAME]: new ObjectID(userToUpdate._id) },
+                  {
+                      $set: updateObject
+                  },
+                  { w: "majority", wtimeout: 100 }
                 );
                 return userToUpdate;
             } else {
@@ -158,5 +109,16 @@ export class UserDAO {
             console.trace(Exception);
             throw Exception;
         }
+    }
+
+    private async getUserCollection() {
+        const client: Client = await DbConnectionBS.getClient()
+          .catch((clientException) => {
+              throw clientException;
+          });
+
+        const db: Db = await DbConnectionBS.getDbFromClient(client);
+        const usersCollection = db.collection(DatabaseConstants.USER_COLLECTION_NAME);
+        return usersCollection;
     }
 }
